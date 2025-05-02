@@ -146,11 +146,10 @@ io.on('connection', (socket) => {
             console.error('Error in stopTyping handler:', error);
         }
     });
-
     // Handle document download request
     socket.on('downloadDocument', ({ room, content }) => {
         try {
-            // Send the document content back to the requesting user
+
             socket.emit('documentContent', { content });
         } catch (error) {
             console.error('Error in downloadDocument handler:', error);
