@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Document Editor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Join Form -->
+        <div id="joinForm" class="join-form">
+            <div class="join-card">
+                <h1>Collaborative Document Editor</h1>
+                <p class="join-description">Create and collaborate on documents in real-time with your team.</p>
+                <div class="input-group">
+                    <input type="text" id="userName" placeholder="Your Name" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="roomId" placeholder="Room ID" required>
+                </div>
+                <button class="join-btn" onclick="joinRoom()">
+                    <i class="fas fa-sign-in-alt"></i> Join Room
+                </button>
+                <div class="join-footer">
+                    <p>Don't have a room ID? Just enter a name and create a new room!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Editor Container -->
+        <div id="editorContainer" class="editor-container" style="display: none;">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="room-info">
+                    <h2><i class="fas fa-door-open"></i> Room: <span id="currentRoom"></span></h2>
+                    <button id="copyRoomId" class="copy-btn" title="Copy Room ID">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="users-section">
+                    <h3><i class="fas fa-users"></i> Active Users</h3>
+                    <div id="usersList" class="users-list"></div>
+                </div>
+                <div id="typingIndicator" class="typing-indicator" style="display: none;"></div>
+                <div class="sidebar-footer">
+                    <button id="leaveRoom" class="leave-btn" onclick="leaveRoom()">
+                        <i class="fas fa-sign-out-alt"></i> Leave Room
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <!-- Text Formatting -->
+                    <div class="format-group">
+                        <button title="Bold" onclick="formatText('bold')"><i class="fas fa-bold"></i></button>
+                        <button title="Italic" onclick="formatText('italic')"><i class="fas fa-italic"></i></button>
+                        <button title="Underline" onclick="formatText('underline')"><i class="fas fa-underline"></i></button>
+                        <button title="Strikethrough" onclick="formatText('strikethrough')"><i class="fas fa-strikethrough"></i></button>
+                    </div>
+                    
+                    <!-- Headings -->
+                    <div class="format-group">
+                        <button title="Heading 1" onclick="formatHeading(1)"><i class="fas fa-heading"></i>1</button>
+                        <button title="Heading 2" onclick="formatHeading(2)"><i class="fas fa-heading"></i>2</button>
+                        <button title="Heading 3" onclick="formatHeading(3)"><i class="fas fa-heading"></i>3</button>
+                    </div>
+                    
+                    <!-- Alignment -->
+                    <div class="format-group">
+                        <button title="Align Left" onclick="formatText('justifyLeft')"><i class="fas fa-align-left"></i></button>
+                        <button title="Align Center" onclick="formatText('justifyCenter')"><i class="fas fa-align-center"></i></button>
+                        <button title="Align Right" onclick="formatText('justifyRight')"><i class="fas fa-align-right"></i></button>
+                    </div>
+                    
+                    <!-- Lists -->
+                    <div class="format-group">
+                        <button title="Bullet List" onclick="formatText('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+                        <button title="Numbered List" onclick="formatText('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+                        <button title="Indent" onclick="formatText('indent')"><i class="fas fa-indent"></i></button>
+                        <button title="Outdent" onclick="formatText('outdent')"><i class="fas fa-outdent"></i></button>
+                    </div>
+                    
+                    <!-- Advanced Formatting -->
+                    <div class="format-group">
+                        <button title="Insert Link" onclick="insertLink()"><i class="fas fa-link"></i></button>
+                        <button title="Insert Image" onclick="insertImage()"><i class="fas fa-image"></i></button>
+                        <button title="Insert Table" onclick="insertTable()"><i class="fas fa-table"></i></button>
+                        <button title="Insert Code Block" onclick="insertCodeBlock()"><i class="fas fa-code"></i></button>
+                        <button title="Insert Quote" onclick="insertQuote()"><i class="fas fa-quote-right"></i></button>
+                        <button title="Clear Formatting" onclick="clearFormatting()"><i class="fas fa-remove-format"></i></button>
+                    </div>
+                    
+                    <!-- Document Actions -->
+                    <div class="format-group">
+                        <button title="Download Document" onclick="downloadDocument()"><i class="fas fa-download"></i></button>
+                        <button title="Save Document" onclick="saveDocument()"><i class="fas fa-save"></i></button>
+                    </div>
+                </div>
+
+                <!-- Editor -->
+                <div class="editor-wrapper">
+                    <div id="editor" class="editor" contenteditable="true"></div>
+                    <div id="cursors" class="cursors"></div>
+                </div>
+                
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <div class="status-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="lastSaved">Last saved: Never</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-users"></i>
+                        <span id="userCount">0 users</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
